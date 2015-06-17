@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  #devise_for :users, ActiveAdmin::Devise.config
+  #devise_for :admin_users, ActiveAdmin::Devise.config
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
@@ -7,6 +10,16 @@ Rails.application.routes.draw do
   root to: "home#index"
 
   devise_for :users, controllers: { sessions: "sessions" }
+
+  config = ActiveAdmin::Devise.config
+  config[:controllers][:sessions] = "sessions"
+  config[:as] = 'admin' # override standard_path_variable naming for admins
+  devise_for :users, config
+
+
+
+  ActiveAdmin.routes(self)
+
   devise_scope :user do
     resources :tokens ,constraints: { format: 'json' } do
       collection do
@@ -14,6 +27,13 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  resources :tours do
+    collection do
+      post :company
+    end
+  end
+
 
   resources :users ,constraints: { format: 'json' }
 
